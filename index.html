@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Free Fire Likes Sender</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container" id="loginScreen">
+    <h1>Enter Access Key</h1>
+    <input type="password" id="accessKey" placeholder="Enter Key"/>
+    <button onclick="validateKey()">Submit</button>
+    <p id="loginError" class="error hidden">Invalid key. Try again.</p>
+  </div>
+
+  <div class="container hidden" id="dashboard">
+    <h2>Select Your Region</h2>
+    <div class="region-buttons">
+      <button class="region-button" onclick="selectRegion('sg')">SG</button>
+      <button class="region-button" onclick="selectRegion('ind')">IND</button>
+      <button class="region-button" onclick="selectRegion('id')">ID</button>
+      <button class="region-button" onclick="selectRegion('me')">ME</button>
+      <button class="region-button" onclick="selectRegion('br')">BR</button>
+      <button class="region-button" onclick="selectRegion('vn')">VN</button>
+      <button class="region-button" onclick="selectRegion('bd')">BD</button>
+    </div>
+
+    <div class="form-section">
+      <label>UID:</label>
+      <input type="text" id="uid" placeholder="Enter your UID" />
+    </div>
+
+    <div class="form-section">
+      <button onclick="getSecret()">Get Secret Key</button>
+    </div>
+
+    <div class="form-section">
+      <button id="sendBtn" class="hidden" onclick="sendLikes()">Send Likes</button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="hidden">
+      <div class="spinner"></div>
+      <p>Sending likes... Please wait.</p>
+    </div>
+
+    <pre id="status" class="success hidden"></pre>
+    <pre id="error" class="error hidden"></pre>
+
+    <div class="community-links">
+      <p>Join our community:</p>
+      <a href="https://discord.gg/pkesP6v9" target="_blank" class="discord-button">Join Discord</a>
+      <a href="https://whatsapp.com/channel/0029VbAVH8d2ZjCoQL5G8h2o" target="_blank" class="whatsapp-button">Join WhatsApp</a>
+    </div>
+  </div>
+
+  <script>
+    const adLink1 = "https://phoampor.top/4/9217779";
+    const adLink2 = "https://phoampor.top/4/9217777";
+    const loginKey = "Tesh01";
+    const secretKey = "Tesh01";
+
+    let selectedRegion = "";
+    let keyUnlocked = false;
+
+    function validateKey() {
+      const enteredKey = document.getElementById("accessKey").value.trim();
+      if (enteredKey === loginKey) {
+        window.open(adLink1, "_blank");
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+      } else {
+        document.getElementById("loginError").classList.remove("hidden");
+      }
+    }
+
+    function selectRegion(region) {
+      selectedRegion = region;
+      const regionButtons = document.querySelectorAll(".region-buttons .region-button");
+      regionButtons.forEach(button => button.classList.remove("selected"));
+      const selectedButton = document.querySelector(`.region-buttons button[onclick="selectRegion('${region}')"]`);
+      selectedButton.classList.add("selected");
+      alert("Region selected: " + region.toUpperCase());
+    }
+
+    function getSecret() {
+      window.open(adLink2, "_blank");
+      setTimeout(() => {
+        keyUnlocked = true;
+        document.getElementById("sendBtn").classList.remove("hidden");
+        alert("Secret key loaded. You can now send likes.");
+      }, 6000);
+    }
+
+    function sendLikes() {
+      const uid = document.getElementById("uid").value.trim();
+      const status = document.getElementById("status");
+      const error = document.getElementById("error");
+      const loadingSpinner = document.getElementById("loadingSpinner");
+
+      status.classList.add("hidden");
+      error.classList.add("hidden");
+      loadingSpinner.classList.remove("hidden");
+
+      if (!selectedRegion) {
+        alert("Please select a region.");
+        loadingSpinner.classList.add("hidden");
+        return;
+      }
+
+      if (!uid || isNaN(uid)) {
+        alert("Please enter a valid UID.");
+        loadingSpinner.classList.add("hidden");
+        return;
+      }
+
+      if (!keyUnlocked) {
+        alert("You must click Get Secret Key first.");
+        loadingSpinner.classList.add("hidden");
+        return;
+      }
+
+      const apiUrl = `https://likes.api.freefireofficial.com/api/${selectedRegion}/${uid}?key=${secretKey}`;
+
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+          loadingSpinner.classList.add("hidden");
+
+          if (data.status === 3) {
+            error.textContent = `❌ ${data.message}`;
+            error.classList.remove("hidden");
+          } else if (data.status === 1) {
+            const res = data.response;
+            status.innerHTML = `
+✅ <b>Likes sent successfully!</b><br><br>
+👤 UID: <b>${res.UID}</b><br>
+📛 Nickname: <b>${res.PlayerNickname}</b><br>
+🎮 Level: <b>${res.PlayerLevel}</b><br>
+👍 Likes Given: <b>${res.LikesGivenByAPI}</b><br>
+⬅️ Likes Before: <b>${res.LikesbeforeCommand}</b><br>
+➡️ Likes After: <b>${res.LikesafterCommand}</b><br>
+            `;
+            status.classList.remove("hidden");
+          } else {
+            error.textContent = `❌ Unexpected error: ${data.message}`;
+            error.classList.remove("hidden");
+          }
+        })
+        .catch(err => {
+          loadingSpinner.classList.add("hidden");
+          error.textContent = "❌ Error sending likes. Please try again.";
+          error.classList.remove("hidden");
+          console.error("Fetch error:", err);
+        });
+    }
+  </script>
+</body>
+</html>
