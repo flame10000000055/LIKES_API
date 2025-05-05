@@ -32,7 +32,7 @@ function getSecret() {
   setTimeout(() => {
     keyUnlocked = true;
     document.getElementById("sendBtn").classList.remove("hidden");
-    alert("Secret key loaded. You can now send likes.");
+    
   }, 6000);
 }
 
